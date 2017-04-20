@@ -6,7 +6,7 @@ import java.util.List;
 public class Friend {
 
 	private String email;
-	private List<Friend> friends;
+	private List<String> friends;
 	
 	public Friend(String email) {
 		this.email = email;
@@ -21,16 +21,18 @@ public class Friend {
 		this.email = email;
 	}
 
-	public List<Friend> getFriends() {
+	public List<String> getFriends() {
 		return friends;
 	}
 
-	public void setFriends(List<Friend> friends) {
+	public void setFriends(List<String> friends) {
 		this.friends = friends;
 	}
 	
-	public void addFriend(Friend friend) {
-		friends.add(friend);
+	public void addFriend(String friend) {
+		if(!friends.contains(friend)) {
+			friends.add(friend);
+		}
 	}
 
 	@Override

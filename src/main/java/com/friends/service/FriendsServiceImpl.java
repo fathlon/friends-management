@@ -2,10 +2,12 @@ package com.friends.service;
 
 import java.util.List;
 
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.friends.dao.FriendsDAO;
+import com.friends.exception.EmailNotFoundException;
 import com.friends.exception.InvalidParamException;
 
 @Service
@@ -35,6 +37,15 @@ public class FriendsServiceImpl implements FriendsService {
 		} catch(ClassCastException cce) {
 			throw new InvalidParamException("ClassCastException");
 		}
+	}
+
+	@Override
+	public List<String> getFriendList(String email) throws InvalidParamException, EmailNotFoundException {
+		if(StringUtils.isBlank(email)) {
+			throw new InvalidParamException("String is blank");
+		}
+		
+		return friendsDAO.getFriendList(email);
 	}
 
 }

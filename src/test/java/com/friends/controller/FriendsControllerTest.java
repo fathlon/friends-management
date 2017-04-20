@@ -60,6 +60,8 @@ public class FriendsControllerTest {
 		ResponseEntity<ApiResponse> response = restTemplate.exchange(baseUrl + "/add", HttpMethod.POST, httpEntity, ApiResponse.class);
 		
 		assertThat(response.getBody().getSuccess()).isTrue();
+		assertThat(response.getBody().getFriends()).isNullOrEmpty();
+		assertThat(response.getBody().getCount()).isNull();
 		assertThat(response.getBody().getError()).isNullOrEmpty();
 	}
 	
@@ -70,6 +72,8 @@ public class FriendsControllerTest {
 		ResponseEntity<ApiResponse> response = restTemplate.exchange(baseUrl + "/add", HttpMethod.POST, httpEntity, ApiResponse.class);
 		
 		assertThat(response.getBody().getSuccess()).isNull();
+		assertThat(response.getBody().getFriends()).isNullOrEmpty();
+		assertThat(response.getBody().getCount()).isNull();
 		assertThat(response.getBody().getError()).isEqualTo(GlobalExceptionHandler.UNEXPECTED_MSG);
 	}
 	
@@ -80,6 +84,8 @@ public class FriendsControllerTest {
 		ResponseEntity<ApiResponse> response = restTemplate.exchange(baseUrl + "/add", HttpMethod.POST, httpEntity, ApiResponse.class);
 		
 		assertThat(response.getBody().getSuccess()).isNull();
+		assertThat(response.getBody().getFriends()).isNullOrEmpty();
+		assertThat(response.getBody().getCount()).isNull();
 		assertThat(response.getBody().getError()).isEqualTo(GlobalExceptionHandler.INVALID_PARAM_MSG);
 	}
 	
@@ -90,6 +96,44 @@ public class FriendsControllerTest {
 		ResponseEntity<ApiResponse> response = restTemplate.exchange(baseUrl + "/add", HttpMethod.POST, httpEntity, ApiResponse.class);
 		
 		assertThat(response.getBody().getSuccess()).isNull();
+		assertThat(response.getBody().getFriends()).isNullOrEmpty();
+		assertThat(response.getBody().getCount()).isNull();
+		assertThat(response.getBody().getError()).isEqualTo(GlobalExceptionHandler.INVALID_PARAM_MSG);
+	}
+	
+	@Test
+	public void testListFriendsSuccessfully() throws IOException {
+		String json = getJsonContent("list_friends.json");
+		HttpEntity<String> httpEntity = new HttpEntity<String>(json, headers);
+		ResponseEntity<ApiResponse> response = restTemplate.exchange(baseUrl + "/list", HttpMethod.POST, httpEntity, ApiResponse.class);
+		
+		assertThat(response.getBody().getSuccess()).isTrue();
+		assertThat(response.getBody().getFriends()).containsExactlyInAnyOrder("john@example.com");
+		assertThat(response.getBody().getCount()).isEqualTo(new Integer(1));
+		assertThat(response.getBody().getError()).isNull();
+	}
+	
+	@Test
+	public void testListFriendsForNewPersonThrowNotFound() throws IOException {
+		String json = getJsonContent("list_friends_not_found.json");
+		HttpEntity<String> httpEntity = new HttpEntity<String>(json, headers);
+		ResponseEntity<ApiResponse> response = restTemplate.exchange(baseUrl + "/list", HttpMethod.POST, httpEntity, ApiResponse.class);
+		
+		assertThat(response.getBody().getSuccess()).isNull();
+		assertThat(response.getBody().getFriends()).isNullOrEmpty();
+		assertThat(response.getBody().getCount()).isNull();
+		assertThat(response.getBody().getError()).isEqualTo(GlobalExceptionHandler.EMAIL_NOT_FOUND);
+	}
+	
+	@Test
+	public void testListFriendsForMissingKeyWillThrowException() throws IOException {
+		String json = getJsonContent("add_friends_success.json");
+		HttpEntity<String> httpEntity = new HttpEntity<String>(json, headers);
+		ResponseEntity<ApiResponse> response = restTemplate.exchange(baseUrl + "/list", HttpMethod.POST, httpEntity, ApiResponse.class);
+		
+		assertThat(response.getBody().getSuccess()).isNull();
+		assertThat(response.getBody().getFriends()).isNullOrEmpty();
+		assertThat(response.getBody().getCount()).isNull();
 		assertThat(response.getBody().getError()).isEqualTo(GlobalExceptionHandler.INVALID_PARAM_MSG);
 	}
 	

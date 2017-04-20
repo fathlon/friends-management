@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.friends.dto.ApiResponse;
+import com.friends.exception.EmailNotFoundException;
 import com.friends.exception.GlobalExceptionHandler;
 import com.friends.exception.InvalidParamException;
 import com.friends.service.FriendsService;
@@ -32,14 +33,50 @@ public class FriendsController {
 		return result;
 	}
 	
+	@RequestMapping(value="/list", method=RequestMethod.POST, consumes="application/json", produces="application/json")
+	public ApiResponse listFriends(@RequestBody Map<String, Object> requestObj) throws InvalidParamException, EmailNotFoundException {
+		String email = getEmailFromRequest(requestObj);
+		
+		List<String> friendList = friendsService.getFriendList(email);
+		ApiResponse result = new ApiResponse();
+		result.setSuccess(true);
+		result.setFriends(friendList);
+		result.setCount(friendList.size());
+		return result;
+	}
+
 	@RequestMapping()
 	public String defaultMethod(){
 		return "Hello";
 	}
 	
 	/*
+	 * Helper methods
+	 */
+	private String getEmailFromRequest(Map<String, Object> requestObj) throws InvalidParamException {
+		if (requestObj.containsKey(RequestKeys.email.name()) && requestObj.get(RequestKeys.email.name()) instanceof String) {
+			return (String) requestObj.get(RequestKeys.email.name());
+		}
+		throw new InvalidParamException(); 
+	}
+	
+	@SuppressWarnings({ "unchecked", "rawtypes" })
+	private List<String> getFriendsFromRequest(Map<String, Object> requestObj) throws InvalidParamException {
+		if (requestObj.containsKey(RequestKeys.friends.name()) && requestObj.get(RequestKeys.friends.name()) instanceof List) {
+			return (List) requestObj.get(RequestKeys.friends.name());
+		}
+		throw new InvalidParamException(); 
+	}
+	
+	/*
 	 * Exception Handling
 	 */
+	@ExceptionHandler(EmailNotFoundException.class)
+	public ApiResponse handleCheckedError(EmailNotFoundException enfe) {
+		ApiResponse errorResponse = new ApiResponse();
+		errorResponse.setError(GlobalExceptionHandler.EMAIL_NOT_FOUND);
+		return errorResponse;
+	}
 
 	@ExceptionHandler(InvalidParamException.class)
 	public ApiResponse handleCheckedError(InvalidParamException ipe) {
@@ -55,23 +92,6 @@ public class FriendsController {
 		return errorResponse;
 	}
 	
-	/*
-	 * Helper methods
-	 */
-	@SuppressWarnings({ "unchecked", "rawtypes" })
-	private List<String> getFriendsFromRequest(Map<String, Object> requestObj) throws InvalidParamException {
-		if (requestObj.containsKey(RequestKeys.friends.name()) && requestObj.get(RequestKeys.friends.name()) instanceof List) {
-			return (List) requestObj.get(RequestKeys.friends.name());
-		}
-		throw new InvalidParamException(); 
-	}
-	
-	
-//	@RequestMapping(value="/list", method=RequestMethod.GET, produces="application/json")
-//	public String listFriends() {
-//		return "list";
-//	}
-//	
 //	@RequestMapping(value="/listMutual", method=RequestMethod.GET, produces="application/json")
 //	public String listMutualFriends() {
 //		return "listMutual";

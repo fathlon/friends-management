@@ -17,6 +17,7 @@ import org.mockito.MockitoAnnotations;
 import org.mockito.runners.MockitoJUnitRunner;
 
 import com.friends.dao.FriendsDAO;
+import com.friends.exception.EmailNotFoundException;
 import com.friends.exception.InvalidParamException;
 
 @RunWith(MockitoJUnitRunner.class)
@@ -92,5 +93,24 @@ public class FriendsServiceImplTest {
 			assertThat(ipe.getMessage()).isEqualTo("ClassCastException");
 			verifyZeroInteractions(mockFriendsDAO);
 		}
+	}
+	
+	@Test
+	public void testGetFriendListSuccess() throws InvalidParamException, EmailNotFoundException {
+		String friend1 = "kingkong@zoo";
+		unit.getFriendList(friend1);
+		verify(mockFriendsDAO).getFriendList(friend1);
+	}
+	
+	@Test
+	public void testGetFriendListWithEmptyStringWillFail() throws EmailNotFoundException {
+		try {
+			unit.getFriendList("");
+			fail("Should fail if email is empty");
+		} catch (InvalidParamException ipe) {
+			assertThat(ipe.getMessage()).isEqualTo("String is blank");
+			verifyZeroInteractions(mockFriendsDAO);
+		}
+		
 	}
 }

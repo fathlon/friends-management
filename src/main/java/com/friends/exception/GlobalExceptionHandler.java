@@ -16,6 +16,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 	public static final String METHOD_NOT_ALLOWED = "HTTP Method not allowed!";
 	public static final String INVALID_PARAM_MSG = "Missing required parameter(s) or invalid value(s) specified.";
 	public static final String UNEXPECTED_MSG = "An unexpected exception has occurred! Check your request and try again!";
+	public static final String EMAIL_NOT_FOUND = "Email address specified not found in DB!";
 	
 	@Override
 	protected ResponseEntity<Object> handleHttpRequestMethodNotSupported(HttpRequestMethodNotSupportedException ex,
