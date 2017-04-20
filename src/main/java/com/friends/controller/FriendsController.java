@@ -44,6 +44,19 @@ public class FriendsController {
 		result.setCount(friendList.size());
 		return result;
 	}
+	
+	@RequestMapping(value="/listMutual", method=RequestMethod.POST, consumes="application/json", produces="application/json")
+	public ApiResponse listMutualFriends(@RequestBody Map<String, Object> requestObj) throws InvalidParamException, EmailNotFoundException {
+		List<String> friendsParam = getFriendsFromRequest(requestObj);
+		
+		List<String> friendList = friendsService.getMutualFriendList(friendsParam);
+		ApiResponse result = new ApiResponse();
+		result.setSuccess(true);
+		result.setFriends(friendList);
+		result.setCount(friendList.size());
+		return result;
+	}
+	
 
 	@RequestMapping()
 	public String defaultMethod(){
@@ -92,11 +105,6 @@ public class FriendsController {
 		return errorResponse;
 	}
 	
-//	@RequestMapping(value="/listMutual", method=RequestMethod.GET, produces="application/json")
-//	public String listMutualFriends() {
-//		return "listMutual";
-//	}
-//	
 //	@RequestMapping(value="/follow", method=RequestMethod.GET, produces="application/json")
 //	public String follow() {
 //		return "follow";

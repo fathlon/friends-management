@@ -1,5 +1,6 @@
 package com.friends.service;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
@@ -46,6 +47,28 @@ public class FriendsServiceImpl implements FriendsService {
 		}
 		
 		return friendsDAO.getFriendList(email);
+	}
+
+	@Override
+	public List<String> getMutualFriendList(List<String> friends) throws InvalidParamException, EmailNotFoundException {
+		String friendEmail1, friendEmail2;
+		try {
+			if(friends.size() != 2) {
+				throw new InvalidParamException();
+			}
+			
+			friendEmail1 = (String) friends.get(0);
+			friendEmail2 = (String) friends.get(1);
+			
+			List<String> friendList1 = getFriendList(friendEmail1);
+			List<String> friendList2 = getFriendList(friendEmail2);
+			List<String> resultList = new ArrayList<>(friendList1);
+			resultList.retainAll(friendList2);
+			return resultList;
+			
+		} catch(ClassCastException cce) {
+			throw new InvalidParamException("ClassCastException");
+		}
 	}
 
 }

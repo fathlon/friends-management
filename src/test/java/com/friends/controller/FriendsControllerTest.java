@@ -138,6 +138,60 @@ public class FriendsControllerTest {
 	}
 	
 	@Test
+	public void testGetMutualFriendsSuccessful() throws IOException {
+		for(int i = 1; i <= 3; i++) {
+			String json = getJsonContent("populate_common_friend" + i + ".json");
+			HttpEntity<String> httpEntity = new HttpEntity<String>(json, headers);
+			restTemplate.exchange(baseUrl + "/add", HttpMethod.POST, httpEntity, ApiResponse.class);
+		}
+		
+		String json = getJsonContent("list_mutual_success.json");
+		HttpEntity<String> httpEntity = new HttpEntity<String>(json, headers);
+		ResponseEntity<ApiResponse> response = restTemplate.exchange(baseUrl + "/listMutual", HttpMethod.POST, httpEntity, ApiResponse.class);
+		
+		assertThat(response.getBody().getSuccess()).isTrue();
+		assertThat(response.getBody().getFriends()).containsExactlyInAnyOrder("common@example.com");
+		assertThat(response.getBody().getCount()).isEqualTo(new Integer(1));
+		assertThat(response.getBody().getError()).isNull();
+	}
+	
+	@Test
+	public void testListMutualNoCommonFriendsWithEmptyList() throws IOException {
+		String json = getJsonContent("list_mutual_no_common.json");
+		HttpEntity<String> httpEntity = new HttpEntity<String>(json, headers);
+		ResponseEntity<ApiResponse> response = restTemplate.exchange(baseUrl + "/listMutual", HttpMethod.POST, httpEntity, ApiResponse.class);
+		
+		assertThat(response.getBody().getSuccess()).isTrue();
+		assertThat(response.getBody().getFriends()).isEmpty();;
+		assertThat(response.getBody().getCount()).isEqualTo(new Integer(0));
+		assertThat(response.getBody().getError()).isNull();
+	}
+	
+	@Test
+	public void testListMutualWithInvalidRequestThrowsException() throws IOException {
+		String json = getJsonContent("add_friends_missing_key.json");
+		HttpEntity<String> httpEntity = new HttpEntity<String>(json, headers);
+		ResponseEntity<ApiResponse> response = restTemplate.exchange(baseUrl + "/listMutual", HttpMethod.POST, httpEntity, ApiResponse.class);
+		
+		assertThat(response.getBody().getSuccess()).isNull();
+		assertThat(response.getBody().getFriends()).isNullOrEmpty();
+		assertThat(response.getBody().getCount()).isNull();
+		assertThat(response.getBody().getError()).isEqualTo(GlobalExceptionHandler.INVALID_PARAM_MSG);
+	}
+	
+	@Test
+	public void testListMutualWith1EmailNotFoundThrowsException() throws IOException {
+		String json = getJsonContent("list_mutual_email_not_found.json");
+		HttpEntity<String> httpEntity = new HttpEntity<String>(json, headers);
+		ResponseEntity<ApiResponse> response = restTemplate.exchange(baseUrl + "/listMutual", HttpMethod.POST, httpEntity, ApiResponse.class);
+		
+		assertThat(response.getBody().getSuccess()).isNull();
+		assertThat(response.getBody().getFriends()).isNullOrEmpty();
+		assertThat(response.getBody().getCount()).isNull();
+		assertThat(response.getBody().getError()).isEqualTo(GlobalExceptionHandler.EMAIL_NOT_FOUND);
+	}
+	
+	@Test
 	public void testDefaultMethod() {
 		ResponseEntity<String> response = restTemplate.getForEntity(baseUrl, String.class);
 		assertThat(response.getBody()).isEqualTo("Hello");
