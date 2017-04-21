@@ -38,24 +38,51 @@ public class FriendsDAOImplTest {
 	}
 	
 	@Test
-	public void testAddFriendSuccess() {
+	public void testAddFriendSuccessWhenNotInEitherBlocklist() {
 		String friendEmail1 = "kingkong@zoo", friendEmail2 = "panda@zoo";
 		Friend mockFriend1 = mock(Friend.class);
 		Friend mockFriend2 = mock(Friend.class);
 		
 		when(mockFriend1.getEmail()).thenReturn(friendEmail1);
 		when(mockFriend2.getEmail()).thenReturn(friendEmail2);
+		when(mockFriend1.isBlocking(friendEmail2)).thenReturn(false);
+		when(mockFriend2.isBlocking(friendEmail1)).thenReturn(false);
 		
 		when(mockFriendsDB.getOrDefault(eq(friendEmail1), any(Friend.class))).thenReturn(mockFriend1);
 		when(mockFriendsDB.getOrDefault(eq(friendEmail2), any(Friend.class))).thenReturn(mockFriend2);
 		
-		unit.addFriend(friendEmail1, friendEmail2);
+		boolean success = unit.addFriend(friendEmail1, friendEmail2);
 		
 		verify(mockFriend1).addFriend(friendEmail2);
 		verify(mockFriend2).addFriend(friendEmail1);
 		
 		verify(mockFriendsDB).put(friendEmail1, mockFriend1);
 		verify(mockFriendsDB).put(friendEmail2, mockFriend2);
+		
+		assertThat(success).isTrue();
+	}
+	
+	@Test
+	public void testAddFriendFailWhenEitherIsBlocking() {
+		String friendEmail1 = "kingkong@zoo", friendEmail2 = "panda@zoo";
+		Friend mockFriend1 = mock(Friend.class);
+		Friend mockFriend2 = mock(Friend.class);
+		
+		when(mockFriendsDB.getOrDefault(eq(friendEmail1), any(Friend.class))).thenReturn(mockFriend1);
+		when(mockFriendsDB.getOrDefault(eq(friendEmail2), any(Friend.class))).thenReturn(mockFriend2);
+		
+		when(mockFriend1.isBlocking(friendEmail2)).thenReturn(true);
+		when(mockFriend2.isBlocking(friendEmail1)).thenReturn(false);
+		
+		boolean success = unit.addFriend(friendEmail1, friendEmail2);
+		
+		verify(mockFriend1, never()).addFriend(anyString());
+		verify(mockFriend2, never()).addFriend(anyString());
+		
+		verify(mockFriendsDB, never()).put(anyString(), any(Friend.class));
+		verify(mockFriendsDB, never()).put(anyString(), any(Friend.class));
+		
+		assertThat(success).isFalse();
 	}
 	
 	@Test
@@ -95,6 +122,29 @@ public class FriendsDAOImplTest {
 		
 		verify(mockRequestor).addFollowing(tar);
 		verify(mockTarget, never()).addFollowing(anyString());
+		
+		verify(mockFriendsDB).put(req, mockRequestor);
+		verify(mockFriendsDB).put(tar, mockTarget);
+		
+		assertThat(success).isTrue();
+	}
+	
+	@Test
+	public void testBlockSuccessful() {
+		String req = "markZuck@fb", tar = "commoner@low";
+		Friend mockRequestor = mock(Friend.class);
+		Friend mockTarget = mock(Friend.class);
+		
+		when(mockRequestor.getEmail()).thenReturn(req);
+		when(mockTarget.getEmail()).thenReturn(tar);
+		
+		when(mockFriendsDB.getOrDefault(eq(req), any(Friend.class))).thenReturn(mockRequestor);
+		when(mockFriendsDB.getOrDefault(eq(tar), any(Friend.class))).thenReturn(mockTarget);
+		
+		boolean success = unit.block(req, tar);
+		
+		verify(mockRequestor).addBlock(tar);
+		verify(mockTarget, never()).addBlock(anyString());
 		
 		verify(mockFriendsDB).put(req, mockRequestor);
 		verify(mockFriendsDB).put(tar, mockTarget);

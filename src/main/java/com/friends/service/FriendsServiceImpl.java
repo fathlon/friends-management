@@ -32,8 +32,7 @@ public class FriendsServiceImpl implements FriendsService {
 				return false;
 			}
 			
-			friendsDAO.addFriend(friend1, friend2);
-			return true;
+			return friendsDAO.addFriend(friend1, friend2);
 			
 		} catch(ClassCastException cce) {
 			throw new InvalidParamException("ClassCastException");
@@ -78,6 +77,15 @@ public class FriendsServiceImpl implements FriendsService {
 		}
 		
 		return friendsDAO.follow(requestor, target);
+	}
+
+	@Override
+	public boolean block(String requestor, String target) throws InvalidParamException {
+		if(StringUtils.isBlank(requestor) || StringUtils.isBlank(target)) {
+			throw new InvalidParamException("String is blank");
+		}
+		
+		return friendsDAO.block(requestor, target);
 	}
 
 }

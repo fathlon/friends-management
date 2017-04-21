@@ -40,13 +40,18 @@ public class FriendsServiceImplTest {
 	}
 
 	@Test
-	public void testAddFriendsSuccessfully() throws InvalidParamException {
+	public void testAddFriendsResultFollowDAOResultIfPassValidation() throws InvalidParamException {
 		String friend1 = "kingkong@zoo", friend2 = "panda@zoo";
 		friends.add(friend1);
 		friends.add(friend2);
+		
+		boolean daoResult = true;
+		
+		when(mockFriendsDAO.addFriend(friend1, friend2)).thenReturn(daoResult);
+		
 		boolean result = unit.addFriend(friends);
 		
-		assertThat(result).isTrue();
+		assertThat(result).isEqualTo(daoResult);
 		verify(mockFriendsDAO).addFriend(friend1, friend2);
 	}
 	
@@ -187,6 +192,26 @@ public class FriendsServiceImplTest {
 		try {
 			String requestor = "kids@zoo", target = "";
 			unit.follow(requestor, target);
+			fail("Should have fail if one email is empty");
+		} catch (InvalidParamException ipe) {
+			assertThat(ipe.getMessage()).isEqualTo("String is blank");
+		} finally {
+			verifyZeroInteractions(mockFriendsDAO);
+		}
+	}
+	
+	@Test
+	public void testBlockSuccessful() throws InvalidParamException {
+		String requestor = "kids@zoo", target = "kingkong@zoo";
+		unit.block(requestor, target);
+		verify(mockFriendsDAO).block(requestor, target);
+	}
+	
+	@Test
+	public void testBlockIfOneEmailIsEmptyThrowsException() {
+		try {
+			String requestor = "kids@zoo", target = "";
+			unit.block(requestor, target);
 			fail("Should have fail if one email is empty");
 		} catch (InvalidParamException ipe) {
 			assertThat(ipe.getMessage()).isEqualTo("String is blank");

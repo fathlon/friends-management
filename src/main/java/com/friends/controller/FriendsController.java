@@ -66,6 +66,16 @@ public class FriendsController {
 		result.setSuccess(friendsService.follow(requestor, target));
 		return result;
 	}
+	
+	@RequestMapping(value="/block", method=RequestMethod.POST, consumes="application/json", produces="application/json")
+	public ApiResponse block(@RequestBody Map<String, Object> requestObj) throws InvalidParamException {
+		String requestor = getStringFromRequest(requestObj, RequestKeys.requestor);
+		String target = getStringFromRequest(requestObj, RequestKeys.target);
+		
+		ApiResponse result = new ApiResponse();
+		result.setSuccess(friendsService.block(requestor, target));
+		return result;
+	}
 
 	@RequestMapping()
 	public String defaultMethod(){
@@ -114,11 +124,7 @@ public class FriendsController {
 		return errorResponse;
 	}
 	
-//	@RequestMapping(value="/block", method=RequestMethod.GET, produces="application/json")
-//	public String block() {
-//		return "block";
-//	}
-//
+
 //	@RequestMapping(value="/listAllWithUpdatesEnabled", method=RequestMethod.GET, produces="application/json")
 //	public String listAllWithUpdatesEnabled() {
 //		return "listAllWithUpdatesEnabled";

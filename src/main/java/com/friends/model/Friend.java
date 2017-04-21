@@ -8,11 +8,13 @@ public class Friend {
 	private String email;
 	private List<String> friends;
 	private List<String> following;
+	private List<String> block;
 	
 	public Friend(String email) {
 		this.email = email;
 		friends = new ArrayList<>();
 		following = new ArrayList<>();
+		block = new ArrayList<>();
 	}
 
 	public String getEmail() {
@@ -41,6 +43,23 @@ public class Friend {
 		if(!following.contains(friend)) {
 			following.add(friend);
 		}
+	}
+
+	public List<String> getBlock() {
+		return block;
+	}
+	
+	public void addBlock(String friend) {
+		if(!block.contains(friend)) {
+			block.add(friend);
+		}
+	}
+	
+	public boolean isBlocking(String friend) {
+		if(block.contains(friend)) {
+			return true;
+		}
+		return false;
 	}
 
 	@Override
