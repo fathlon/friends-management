@@ -35,7 +35,7 @@ public class FriendsController {
 	
 	@RequestMapping(value="/list", method=RequestMethod.POST, consumes="application/json", produces="application/json")
 	public ApiResponse listFriends(@RequestBody Map<String, Object> requestObj) throws InvalidParamException, EmailNotFoundException {
-		String email = getEmailFromRequest(requestObj);
+		String email = getStringFromRequest(requestObj, RequestKeys.email);
 		
 		List<String> friendList = friendsService.getFriendList(email);
 		ApiResponse result = new ApiResponse();
@@ -57,6 +57,15 @@ public class FriendsController {
 		return result;
 	}
 	
+	@RequestMapping(value="/follow", method=RequestMethod.POST, consumes="application/json", produces="application/json")
+	public ApiResponse follow(@RequestBody Map<String, Object> requestObj) throws InvalidParamException {
+		String requestor = getStringFromRequest(requestObj, RequestKeys.requestor);
+		String target = getStringFromRequest(requestObj, RequestKeys.target);
+		
+		ApiResponse result = new ApiResponse();
+		result.setSuccess(friendsService.follow(requestor, target));
+		return result;
+	}
 
 	@RequestMapping()
 	public String defaultMethod(){
@@ -66,9 +75,9 @@ public class FriendsController {
 	/*
 	 * Helper methods
 	 */
-	private String getEmailFromRequest(Map<String, Object> requestObj) throws InvalidParamException {
-		if (requestObj.containsKey(RequestKeys.email.name()) && requestObj.get(RequestKeys.email.name()) instanceof String) {
-			return (String) requestObj.get(RequestKeys.email.name());
+	private String getStringFromRequest(Map<String, Object> requestObj, RequestKeys key) throws InvalidParamException {
+		if (requestObj.containsKey(key.name()) && requestObj.get(key.name()) instanceof String) {
+			return (String) requestObj.get(key.name());
 		}
 		throw new InvalidParamException(); 
 	}
@@ -105,11 +114,6 @@ public class FriendsController {
 		return errorResponse;
 	}
 	
-//	@RequestMapping(value="/follow", method=RequestMethod.GET, produces="application/json")
-//	public String follow() {
-//		return "follow";
-//	}
-//
 //	@RequestMapping(value="/block", method=RequestMethod.GET, produces="application/json")
 //	public String block() {
 //		return "block";

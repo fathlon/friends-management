@@ -7,10 +7,12 @@ public class Friend {
 
 	private String email;
 	private List<String> friends;
+	private List<String> following;
 	
 	public Friend(String email) {
 		this.email = email;
 		friends = new ArrayList<>();
+		following = new ArrayList<>();
 	}
 
 	public String getEmail() {
@@ -25,13 +27,19 @@ public class Friend {
 		return friends;
 	}
 
-	public void setFriends(List<String> friends) {
-		this.friends = friends;
-	}
-	
 	public void addFriend(String friend) {
 		if(!friends.contains(friend)) {
 			friends.add(friend);
+		}
+	}
+	
+	public List<String> getFollowing() {
+		return following;
+	}
+	
+	public void addFollowing(String friend) {
+		if(!following.contains(friend)) {
+			following.add(friend);
 		}
 	}
 
@@ -59,6 +67,5 @@ public class Friend {
 			return false;
 		return true;
 	}
-	
-	
+
 }

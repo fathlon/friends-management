@@ -1,9 +1,12 @@
 package com.friends.dao;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.fail;
 import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -75,4 +78,28 @@ public class FriendsDAOImplTest {
 			fail("Should have thrown not found exception");
 		} catch (EmailNotFoundException e) {}
 	}
+	
+	@Test
+	public void testFollowSuccessful() {
+		String req = "markZuck@fb", tar = "commoner@low";
+		Friend mockRequestor = mock(Friend.class);
+		Friend mockTarget = mock(Friend.class);
+		
+		when(mockRequestor.getEmail()).thenReturn(req);
+		when(mockTarget.getEmail()).thenReturn(tar);
+		
+		when(mockFriendsDB.getOrDefault(eq(req), any(Friend.class))).thenReturn(mockRequestor);
+		when(mockFriendsDB.getOrDefault(eq(tar), any(Friend.class))).thenReturn(mockTarget);
+		
+		boolean success = unit.follow(req, tar);
+		
+		verify(mockRequestor).addFollowing(tar);
+		verify(mockTarget, never()).addFollowing(anyString());
+		
+		verify(mockFriendsDB).put(req, mockRequestor);
+		verify(mockFriendsDB).put(tar, mockTarget);
+		
+		assertThat(success).isTrue();
+	}
+	
 }

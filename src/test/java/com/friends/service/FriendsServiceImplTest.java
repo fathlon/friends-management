@@ -67,6 +67,7 @@ public class FriendsServiceImplTest {
 			unit.addFriend(friends);
 			fail("Should throw exception when less than 2 friend in List");
 		} catch (InvalidParamException e) {
+		} finally {
 			verifyZeroInteractions(mockFriendsDAO);
 		}
 		
@@ -77,6 +78,7 @@ public class FriendsServiceImplTest {
 			unit.addFriend(friends);
 			fail("Should throw exception when more than 2 friend in List");
 		} catch (InvalidParamException e) {
+		} finally {
 			verifyZeroInteractions(mockFriendsDAO);
 		}
 	}
@@ -93,6 +95,7 @@ public class FriendsServiceImplTest {
 			fail("Should throw exception when List contain wrong type");
 		} catch (InvalidParamException ipe) {
 			assertThat(ipe.getMessage()).isEqualTo("ClassCastException");
+		} finally {
 			verifyZeroInteractions(mockFriendsDAO);
 		}
 	}
@@ -111,6 +114,7 @@ public class FriendsServiceImplTest {
 			fail("Should fail if email is empty");
 		} catch (InvalidParamException ipe) {
 			assertThat(ipe.getMessage()).isEqualTo("String is blank");
+		} finally {
 			verifyZeroInteractions(mockFriendsDAO);
 		}
 	}
@@ -155,6 +159,7 @@ public class FriendsServiceImplTest {
 			unit.getMutualFriendList(friends);
 			fail("Should throw exception when less than 2 friend in List");
 		} catch (InvalidParamException e) {
+		} finally {
 			verifyZeroInteractions(mockFriendsDAO);
 		}
 		
@@ -165,6 +170,27 @@ public class FriendsServiceImplTest {
 			unit.getMutualFriendList(friends);
 			fail("Should throw exception when more than 2 friend in List");
 		} catch (InvalidParamException e) {
+		} finally {
+			verifyZeroInteractions(mockFriendsDAO);
+		}
+	}
+	
+	@Test
+	public void testFollowSuccessful() throws InvalidParamException {
+		String requestor = "kids@zoo", target = "kingkong@zoo";
+		unit.follow(requestor, target);
+		verify(mockFriendsDAO).follow(requestor, target);
+	}
+	
+	@Test
+	public void testFollowIfOneEmailIsEmptyThrowsException() {
+		try {
+			String requestor = "kids@zoo", target = "";
+			unit.follow(requestor, target);
+			fail("Should have fail if one email is empty");
+		} catch (InvalidParamException ipe) {
+			assertThat(ipe.getMessage()).isEqualTo("String is blank");
+		} finally {
 			verifyZeroInteractions(mockFriendsDAO);
 		}
 	}

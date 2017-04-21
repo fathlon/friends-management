@@ -1,5 +1,5 @@
 package com.friends.util;
 
 public enum RequestKeys {
-	friends, email
+	friends, email, requestor, target
 }

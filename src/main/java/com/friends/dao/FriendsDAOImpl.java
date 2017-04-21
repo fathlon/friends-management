@@ -28,12 +28,24 @@ public class FriendsDAOImpl implements FriendsDAO {
 
 	@Override
 	public List<String> getFriendList(String email) throws EmailNotFoundException {
-
 		Friend friend = friendsDB.get(email);
 		if (friend == null) {
 			throw new EmailNotFoundException();
 		}
 		return friend.getFriends();
+	}
+
+	@Override
+	public boolean follow(String requestorEmail, String targetEmail) {
+		Friend requestor = friendsDB.getOrDefault(requestorEmail, new Friend(requestorEmail));
+		Friend target = friendsDB.getOrDefault(targetEmail, new Friend(targetEmail));
+		
+		requestor.addFollowing(target.getEmail());
+		
+		friendsDB.put(requestor.getEmail(), requestor);
+		friendsDB.put(target.getEmail(), target);
+		
+		return true;
 	}
 
 }

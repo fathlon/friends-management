@@ -12,4 +12,6 @@ public interface FriendsService {
 	public List<String> getFriendList(String email) throws InvalidParamException, EmailNotFoundException;
 
 	public List<String> getMutualFriendList(List<String> friends) throws InvalidParamException, EmailNotFoundException;
+
+	public boolean follow(String requestor, String target) throws InvalidParamException;
 }

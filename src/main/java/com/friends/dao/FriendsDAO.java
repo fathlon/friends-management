@@ -10,4 +10,6 @@ public interface FriendsDAO {
 
 	public List<String> getFriendList(String email) throws EmailNotFoundException;
 
+	public boolean follow(String requestorEmail, String targetEmail);
+
 }

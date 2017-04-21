@@ -192,6 +192,42 @@ public class FriendsControllerTest {
 	}
 	
 	@Test
+	public void testFollowSuccessful() throws IOException {
+		String json = getJsonContent("follow.json");
+		HttpEntity<String> httpEntity = new HttpEntity<String>(json, headers);
+		ResponseEntity<ApiResponse> response = restTemplate.exchange(baseUrl + "/follow", HttpMethod.POST, httpEntity, ApiResponse.class);
+		
+		assertThat(response.getBody().getSuccess()).isTrue();
+		assertThat(response.getBody().getFriends()).isNullOrEmpty();
+		assertThat(response.getBody().getCount()).isNull();
+		assertThat(response.getBody().getError()).isNull();
+	}
+	
+	@Test
+	public void testFollowWithEmptyEmailThrowsException() throws IOException {
+		String json = getJsonContent("follow_with_empty_email.json");
+		HttpEntity<String> httpEntity = new HttpEntity<String>(json, headers);
+		ResponseEntity<ApiResponse> response = restTemplate.exchange(baseUrl + "/follow", HttpMethod.POST, httpEntity, ApiResponse.class);
+		
+		assertThat(response.getBody().getSuccess()).isNull();;
+		assertThat(response.getBody().getFriends()).isNullOrEmpty();
+		assertThat(response.getBody().getCount()).isNull();
+		assertThat(response.getBody().getError()).isEqualTo(GlobalExceptionHandler.INVALID_PARAM_MSG);
+	}
+	
+	@Test
+	public void testFollowWitInvalidRequestThrowsException() throws IOException {
+		String json = getJsonContent("list_friends.json");
+		HttpEntity<String> httpEntity = new HttpEntity<String>(json, headers);
+		ResponseEntity<ApiResponse> response = restTemplate.exchange(baseUrl + "/follow", HttpMethod.POST, httpEntity, ApiResponse.class);
+		
+		assertThat(response.getBody().getSuccess()).isNull();;
+		assertThat(response.getBody().getFriends()).isNullOrEmpty();
+		assertThat(response.getBody().getCount()).isNull();
+		assertThat(response.getBody().getError()).isEqualTo(GlobalExceptionHandler.INVALID_PARAM_MSG);
+	}
+	
+	@Test
 	public void testDefaultMethod() {
 		ResponseEntity<String> response = restTemplate.getForEntity(baseUrl, String.class);
 		assertThat(response.getBody()).isEqualTo("Hello");

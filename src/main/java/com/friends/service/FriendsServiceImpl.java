@@ -71,4 +71,13 @@ public class FriendsServiceImpl implements FriendsService {
 		}
 	}
 
+	@Override
+	public boolean follow(String requestor, String target) throws InvalidParamException {
+		if(StringUtils.isBlank(requestor) || StringUtils.isBlank(target)) {
+			throw new InvalidParamException("String is blank");
+		}
+		
+		return friendsDAO.follow(requestor, target);
+	}
+
 }
