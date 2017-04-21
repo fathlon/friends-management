@@ -3,7 +3,10 @@ package com.friends.controller;
 import java.util.List;
 import java.util.Map;
 
+import javax.servlet.http.HttpServletResponse;
+
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -115,23 +118,32 @@ public class FriendsController {
 	 * Exception Handling
 	 */
 	@ExceptionHandler(EmailNotFoundException.class)
-	public ApiResponse handleCheckedError(EmailNotFoundException enfe) {
+	public ApiResponse handleCheckedError(EmailNotFoundException enfe, HttpServletResponse response) {
 		ApiResponse errorResponse = new ApiResponse();
 		errorResponse.setError(GlobalExceptionHandler.EMAIL_NOT_FOUND);
+		
+		response.setStatus(HttpStatus.BAD_REQUEST.value());
+		
 		return errorResponse;
 	}
 
 	@ExceptionHandler(InvalidParamException.class)
-	public ApiResponse handleCheckedError(InvalidParamException ipe) {
+	public ApiResponse handleCheckedError(InvalidParamException ipe, HttpServletResponse response) {
 		ApiResponse errorResponse = new ApiResponse();
 		errorResponse.setError(GlobalExceptionHandler.INVALID_PARAM_MSG);
+		
+		response.setStatus(HttpStatus.BAD_REQUEST.value());
+		
 		return errorResponse;
 	}
 	
 	@ExceptionHandler(Exception.class)
-	public ApiResponse handleError(Exception ex) {
+	public ApiResponse handleError(Exception ex, HttpServletResponse response) {
 		ApiResponse errorResponse = new ApiResponse();
 		errorResponse.setError(GlobalExceptionHandler.UNEXPECTED_MSG);
+		
+		response.setStatus(HttpStatus.INTERNAL_SERVER_ERROR.value());
+		
 		return errorResponse;
 	}
 	
