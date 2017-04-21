@@ -1,7 +1,11 @@
 package com.friends.dao;
 
+import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.springframework.stereotype.Repository;
@@ -65,6 +69,20 @@ public class FriendsDAOImpl implements FriendsDAO {
 		friendsDB.put(target.getEmail(), target);
 		
 		return true;
+	}
+
+	@Override
+	public List<String> findAllAllowedFriends(String senderEmail, List<String> splitText) {
+		Set<String> allowedFriends = new HashSet<>();
+		for (Entry<String, Friend> entry : friendsDB.entrySet()) {
+			Friend current = entry.getValue();
+			if(!current.isBlocking(senderEmail) && 
+					(current.isFriend(senderEmail) || current.isFollowing(senderEmail) || splitText.contains(current.getEmail()))
+					) {
+				allowedFriends.add(current.getEmail());
+			}
+		}
+		return new ArrayList<>(allowedFriends);
 	}
 
 }

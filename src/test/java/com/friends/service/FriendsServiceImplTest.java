@@ -219,4 +219,26 @@ public class FriendsServiceImplTest {
 			verifyZeroInteractions(mockFriendsDAO);
 		}
 	}
+	
+	@Test
+	public void testFindAllowdedSuccessful() throws InvalidParamException {
+		String sender = "kids@zoo", text = "king kong zoo";
+		List<String> splitText = new ArrayList<>(Arrays.asList("king", "kong", "zoo"));
+		unit.findAllAllowedFriends(sender, text);
+		verify(mockFriendsDAO).findAllAllowedFriends(sender, splitText);
+	}
+	
+	@Test
+	public void testFindAllowedIfOneEmailIsEmptyThrowsException() {
+		try {
+			String sender = "kids@zoo", text = "";
+			unit.findAllAllowedFriends(sender, text);
+			fail("Should have fail if one of the field is empty");
+		} catch (InvalidParamException ipe) {
+			assertThat(ipe.getMessage()).isEqualTo("String is blank");
+		} finally {
+			verifyZeroInteractions(mockFriendsDAO);
+		}
+	}
+	
 }

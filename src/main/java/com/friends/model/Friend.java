@@ -35,6 +35,13 @@ public class Friend {
 		}
 	}
 	
+	public boolean isFriend(String friend) {
+		if(friends.contains(friend)) {
+			return true;
+		}
+		return false;
+	}
+	
 	public List<String> getFollowing() {
 		return following;
 	}
@@ -43,6 +50,13 @@ public class Friend {
 		if(!following.contains(friend)) {
 			following.add(friend);
 		}
+	}
+	
+	public boolean isFollowing(String friend) {
+		if(following.contains(friend)) {
+			return true;
+		}
+		return false;
 	}
 
 	public List<String> getBlock() {

@@ -8,6 +8,7 @@ public class ApiResponse {
 	private String error;
 	private List<String> friends;
 	private Integer count;
+	private List<String> recipients;
 	
 	public Boolean getSuccess() {
 		return success;
@@ -39,6 +40,14 @@ public class ApiResponse {
 
 	public void setCount(Integer count) {
 		this.count = count;
+	}
+
+	public List<String> getRecipients() {
+		return recipients;
+	}
+
+	public void setRecipients(List<String> recipients) {
+		this.recipients = recipients;
 	}
 	
 }

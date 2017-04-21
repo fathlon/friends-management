@@ -14,4 +14,6 @@ public interface FriendsDAO {
 
 	public boolean block(String requestorEmail, String targetEmail);
 
+	public List<String> findAllAllowedFriends(String senderEmail, List<String> splitText);
+
 }

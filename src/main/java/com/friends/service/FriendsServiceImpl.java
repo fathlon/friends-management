@@ -1,6 +1,7 @@
 package com.friends.service;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
@@ -86,6 +87,15 @@ public class FriendsServiceImpl implements FriendsService {
 		}
 		
 		return friendsDAO.block(requestor, target);
+	}
+
+	@Override
+	public List<String> findAllAllowedFriends(String sender, String text) throws InvalidParamException {
+		if(StringUtils.isBlank(sender) || StringUtils.isBlank(text)) {
+			throw new InvalidParamException("String is blank");
+		}
+		List<String> splitText = new ArrayList<>(Arrays.asList(text.split("\\s")));
+		return friendsDAO.findAllAllowedFriends(sender, splitText);
 	}
 
 }

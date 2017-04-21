@@ -10,6 +10,10 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.junit.Before;
@@ -150,6 +154,45 @@ public class FriendsDAOImplTest {
 		verify(mockFriendsDB).put(tar, mockTarget);
 		
 		assertThat(success).isTrue();
+	}
+	
+	@Test
+	public void testfindAllAllowedFriends() {
+		String senderEmail = "spammer@everywhere";
+		String story = "In the land far far away, "
+				+ "I am walking-pass a stream and I see a woman, i-stalk her and "
+				+ "upon noticing me, she says i-dont-really-like-you i-like-spammer . ";
+		
+		List<String> splitText = new ArrayList<>(Arrays.asList(story.split("\\s")));
+		
+		Friend spammerFriend = new Friend("i-like-spammer");
+		spammerFriend.addFriend(senderEmail);
+		
+		Friend notFriendButFollow = new Friend("i-stalk");
+		notFriendButFollow.addFollowing(senderEmail);
+		
+		Friend friendButBlockingSpammer = new Friend("i-dont-really-like-you");
+		friendButBlockingSpammer.addFriend(senderEmail);
+		friendButBlockingSpammer.addBlock(senderEmail);
+		
+		Friend randomGuy = new Friend("walking-pass");
+		
+		Friend farawayGuy = new Friend("faraway");
+		farawayGuy.addFriend(spammerFriend.getEmail());
+		farawayGuy.addFriend(notFriendButFollow.getEmail());
+		
+		Map<String, Friend> testFriendsDB = new HashMap<>();
+		testFriendsDB.put(spammerFriend.getEmail(), spammerFriend);
+		testFriendsDB.put(notFriendButFollow.getEmail(), notFriendButFollow);
+		testFriendsDB.put(friendButBlockingSpammer.getEmail(), friendButBlockingSpammer);
+		testFriendsDB.put(randomGuy.getEmail(), randomGuy);
+		testFriendsDB.put(farawayGuy.getEmail(), farawayGuy);
+		
+		Whitebox.setInternalState(unit, "friendsDB", testFriendsDB);
+		
+		List<String> result = unit.findAllAllowedFriends(senderEmail, splitText);
+		
+		assertThat(result).containsExactlyInAnyOrder(spammerFriend.getEmail(), notFriendButFollow.getEmail(), randomGuy.getEmail());
 	}
 	
 }

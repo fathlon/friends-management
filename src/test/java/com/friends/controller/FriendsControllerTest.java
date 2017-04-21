@@ -50,7 +50,10 @@ public class FriendsControllerTest {
 		ResponseEntity<ApiResponse> response = restTemplate.exchange(baseUrl + "/add", HttpMethod.GET, httpEntity, ApiResponse.class);
 		
 		assertThat(response.getBody().getSuccess()).isNull();
+		assertThat(response.getBody().getFriends()).isNullOrEmpty();
+		assertThat(response.getBody().getCount()).isNull();
 		assertThat(response.getBody().getError()).isEqualTo(GlobalExceptionHandler.METHOD_NOT_ALLOWED);
+		assertThat(response.getBody().getRecipients()).isNullOrEmpty();
 	}
 	
 	@Test
@@ -62,7 +65,8 @@ public class FriendsControllerTest {
 		assertThat(response.getBody().getSuccess()).isTrue();
 		assertThat(response.getBody().getFriends()).isNullOrEmpty();
 		assertThat(response.getBody().getCount()).isNull();
-		assertThat(response.getBody().getError()).isNullOrEmpty();
+		assertThat(response.getBody().getError()).isNull();
+		assertThat(response.getBody().getRecipients()).isNullOrEmpty();
 	}
 	
 	@Test
@@ -75,6 +79,7 @@ public class FriendsControllerTest {
 		assertThat(response.getBody().getFriends()).isNullOrEmpty();
 		assertThat(response.getBody().getCount()).isNull();
 		assertThat(response.getBody().getError()).isEqualTo(GlobalExceptionHandler.UNEXPECTED_MSG);
+		assertThat(response.getBody().getRecipients()).isNullOrEmpty();
 	}
 	
 	@Test
@@ -87,6 +92,7 @@ public class FriendsControllerTest {
 		assertThat(response.getBody().getFriends()).isNullOrEmpty();
 		assertThat(response.getBody().getCount()).isNull();
 		assertThat(response.getBody().getError()).isEqualTo(GlobalExceptionHandler.INVALID_PARAM_MSG);
+		assertThat(response.getBody().getRecipients()).isNullOrEmpty();
 	}
 	
 	@Test
@@ -99,18 +105,28 @@ public class FriendsControllerTest {
 		assertThat(response.getBody().getFriends()).isNullOrEmpty();
 		assertThat(response.getBody().getCount()).isNull();
 		assertThat(response.getBody().getError()).isEqualTo(GlobalExceptionHandler.INVALID_PARAM_MSG);
+		assertThat(response.getBody().getRecipients()).isNullOrEmpty();
 	}
 	
 	@Test
 	public void testListFriendsSuccessfully() throws IOException {
-		String json = getJsonContent("list_friends.json");
+		String json = getJsonContent("populate_common_friend1.json");
 		HttpEntity<String> httpEntity = new HttpEntity<String>(json, headers);
+		restTemplate.exchange(baseUrl + "/add", HttpMethod.POST, httpEntity, ApiResponse.class);
+		
+		json = getJsonContent("add_friends_success.json");
+		httpEntity = new HttpEntity<String>(json, headers);
+		restTemplate.exchange(baseUrl + "/add", HttpMethod.POST, httpEntity, ApiResponse.class);
+		
+		json = getJsonContent("list_friends.json");
+		httpEntity = new HttpEntity<String>(json, headers);
 		ResponseEntity<ApiResponse> response = restTemplate.exchange(baseUrl + "/list", HttpMethod.POST, httpEntity, ApiResponse.class);
 		
 		assertThat(response.getBody().getSuccess()).isTrue();
-		assertThat(response.getBody().getFriends()).containsExactlyInAnyOrder("john@example.com");
-		assertThat(response.getBody().getCount()).isEqualTo(new Integer(1));
+		assertThat(response.getBody().getFriends()).containsExactlyInAnyOrder("john@example.com", "common@example.com");
+		assertThat(response.getBody().getCount()).isEqualTo(new Integer(2));
 		assertThat(response.getBody().getError()).isNull();
+		assertThat(response.getBody().getRecipients()).isNullOrEmpty();
 	}
 	
 	@Test
@@ -123,6 +139,7 @@ public class FriendsControllerTest {
 		assertThat(response.getBody().getFriends()).isNullOrEmpty();
 		assertThat(response.getBody().getCount()).isNull();
 		assertThat(response.getBody().getError()).isEqualTo(GlobalExceptionHandler.EMAIL_NOT_FOUND);
+		assertThat(response.getBody().getRecipients()).isNullOrEmpty();
 	}
 	
 	@Test
@@ -135,6 +152,7 @@ public class FriendsControllerTest {
 		assertThat(response.getBody().getFriends()).isNullOrEmpty();
 		assertThat(response.getBody().getCount()).isNull();
 		assertThat(response.getBody().getError()).isEqualTo(GlobalExceptionHandler.INVALID_PARAM_MSG);
+		assertThat(response.getBody().getRecipients()).isNullOrEmpty();
 	}
 	
 	@Test
@@ -153,6 +171,7 @@ public class FriendsControllerTest {
 		assertThat(response.getBody().getFriends()).containsExactlyInAnyOrder("common@example.com");
 		assertThat(response.getBody().getCount()).isEqualTo(new Integer(1));
 		assertThat(response.getBody().getError()).isNull();
+		assertThat(response.getBody().getRecipients()).isNullOrEmpty();
 	}
 	
 	@Test
@@ -165,6 +184,7 @@ public class FriendsControllerTest {
 		assertThat(response.getBody().getFriends()).isEmpty();;
 		assertThat(response.getBody().getCount()).isEqualTo(new Integer(0));
 		assertThat(response.getBody().getError()).isNull();
+		assertThat(response.getBody().getRecipients()).isNullOrEmpty();
 	}
 	
 	@Test
@@ -177,6 +197,7 @@ public class FriendsControllerTest {
 		assertThat(response.getBody().getFriends()).isNullOrEmpty();
 		assertThat(response.getBody().getCount()).isNull();
 		assertThat(response.getBody().getError()).isEqualTo(GlobalExceptionHandler.INVALID_PARAM_MSG);
+		assertThat(response.getBody().getRecipients()).isNullOrEmpty();
 	}
 	
 	@Test
@@ -189,6 +210,7 @@ public class FriendsControllerTest {
 		assertThat(response.getBody().getFriends()).isNullOrEmpty();
 		assertThat(response.getBody().getCount()).isNull();
 		assertThat(response.getBody().getError()).isEqualTo(GlobalExceptionHandler.EMAIL_NOT_FOUND);
+		assertThat(response.getBody().getRecipients()).isNullOrEmpty();
 	}
 	
 	@Test
@@ -201,6 +223,7 @@ public class FriendsControllerTest {
 		assertThat(response.getBody().getFriends()).isNullOrEmpty();
 		assertThat(response.getBody().getCount()).isNull();
 		assertThat(response.getBody().getError()).isNull();
+		assertThat(response.getBody().getRecipients()).isNullOrEmpty();
 	}
 	
 	@Test
@@ -213,6 +236,7 @@ public class FriendsControllerTest {
 		assertThat(response.getBody().getFriends()).isNullOrEmpty();
 		assertThat(response.getBody().getCount()).isNull();
 		assertThat(response.getBody().getError()).isEqualTo(GlobalExceptionHandler.INVALID_PARAM_MSG);
+		assertThat(response.getBody().getRecipients()).isNullOrEmpty();
 	}
 	
 	@Test
@@ -225,6 +249,7 @@ public class FriendsControllerTest {
 		assertThat(response.getBody().getFriends()).isNullOrEmpty();
 		assertThat(response.getBody().getCount()).isNull();
 		assertThat(response.getBody().getError()).isEqualTo(GlobalExceptionHandler.INVALID_PARAM_MSG);
+		assertThat(response.getBody().getRecipients()).isNullOrEmpty();
 	}
 	
 	@Test
@@ -237,6 +262,7 @@ public class FriendsControllerTest {
 		assertThat(response.getBody().getFriends()).isNullOrEmpty();
 		assertThat(response.getBody().getCount()).isNull();
 		assertThat(response.getBody().getError()).isNull();
+		assertThat(response.getBody().getRecipients()).isNullOrEmpty();
 	}
 	
 	@Test
@@ -249,6 +275,7 @@ public class FriendsControllerTest {
 		assertThat(response.getBody().getFriends()).isNullOrEmpty();
 		assertThat(response.getBody().getCount()).isNull();
 		assertThat(response.getBody().getError()).isEqualTo(GlobalExceptionHandler.INVALID_PARAM_MSG);
+		assertThat(response.getBody().getRecipients()).isNullOrEmpty();
 	}
 	
 	@Test
@@ -261,6 +288,7 @@ public class FriendsControllerTest {
 		assertThat(response.getBody().getFriends()).isNullOrEmpty();
 		assertThat(response.getBody().getCount()).isNull();
 		assertThat(response.getBody().getError()).isEqualTo(GlobalExceptionHandler.INVALID_PARAM_MSG);
+		assertThat(response.getBody().getRecipients()).isNullOrEmpty();
 	}
 	
 	@Test
@@ -272,9 +300,56 @@ public class FriendsControllerTest {
 		assertThat(response.getBody().getSuccess()).isFalse();
 		assertThat(response.getBody().getFriends()).isNullOrEmpty();
 		assertThat(response.getBody().getCount()).isNull();
-		assertThat(response.getBody().getError()).isNullOrEmpty();
+		assertThat(response.getBody().getError()).isNull();
+		assertThat(response.getBody().getRecipients()).isNullOrEmpty();
 	}
 	
+	@Test
+	public void testFindAllAllowedUpdates() throws IOException {
+		String json = getJsonContent("populate_common_friend1.json");
+		HttpEntity<String> httpEntity = new HttpEntity<String>(json, headers);
+		restTemplate.exchange(baseUrl + "/add", HttpMethod.POST, httpEntity, ApiResponse.class);
+		
+		json = getJsonContent("block.json");
+		httpEntity = new HttpEntity<String>(json, headers);
+		restTemplate.exchange(baseUrl + "/block", HttpMethod.POST, httpEntity, ApiResponse.class);
+		
+		json = getJsonContent("find_updates.json");
+		httpEntity = new HttpEntity<String>(json, headers);
+		ResponseEntity<ApiResponse> response = restTemplate.exchange(baseUrl + "/listUpdatesAllowedFriend", HttpMethod.POST, httpEntity, ApiResponse.class);
+		
+		assertThat(response.getBody().getSuccess()).isTrue();
+		assertThat(response.getBody().getFriends()).isNullOrEmpty();
+		assertThat(response.getBody().getCount()).isNull();
+		assertThat(response.getBody().getError()).isNull();
+		assertThat(response.getBody().getRecipients()).containsExactlyInAnyOrder("andy@example.com");
+	}
+	
+	@Test
+	public void testFindAllowedWithOneEmptyFieldWillThrowsException() throws IOException {
+		String json = getJsonContent("find_updates_with_empty.json");
+		HttpEntity<String> httpEntity = new HttpEntity<String>(json, headers);
+		ResponseEntity<ApiResponse> response = restTemplate.exchange(baseUrl + "/listUpdatesAllowedFriend", HttpMethod.POST, httpEntity, ApiResponse.class);
+		
+		assertThat(response.getBody().getSuccess()).isNull();;
+		assertThat(response.getBody().getFriends()).isNullOrEmpty();
+		assertThat(response.getBody().getCount()).isNull();
+		assertThat(response.getBody().getError()).isEqualTo(GlobalExceptionHandler.INVALID_PARAM_MSG);
+		assertThat(response.getBody().getRecipients()).isNullOrEmpty();
+	}
+	
+	@Test
+	public void testFindAllowedWithInvalidRequestThrowsException() throws IOException {
+		String json = getJsonContent("list_friends.json");
+		HttpEntity<String> httpEntity = new HttpEntity<String>(json, headers);
+		ResponseEntity<ApiResponse> response = restTemplate.exchange(baseUrl + "/listUpdatesAllowedFriend", HttpMethod.POST, httpEntity, ApiResponse.class);
+		
+		assertThat(response.getBody().getSuccess()).isNull();;
+		assertThat(response.getBody().getFriends()).isNullOrEmpty();
+		assertThat(response.getBody().getCount()).isNull();
+		assertThat(response.getBody().getError()).isEqualTo(GlobalExceptionHandler.INVALID_PARAM_MSG);
+		assertThat(response.getBody().getRecipients()).isNullOrEmpty();
+	}
 	
 	@Test
 	public void testDefaultMethod() {
